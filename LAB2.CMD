@@ -1,0 +1,14 @@
+lplab2.hex
+ioinput2.ab
+y
+c10
+bp0
+io
+output2.ah
+op1
+iointer.ab
+y
+c10
+bp3
+01
+fc

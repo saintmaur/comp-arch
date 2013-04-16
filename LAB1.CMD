@@ -1,0 +1,9 @@
+lplab1.hex
+ioinput1.ab
+y
+op0
+i
+o
+output1.ah
+op1
+fc
