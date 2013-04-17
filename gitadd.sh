@@ -1,3 +1,2 @@
 #!/bin/bash
-
-git add LAB*.ASM LAB*.CMD INPUT* INTER* todo.org
+git add *.DAT LAB*.ASM LAB*.CMD gitadd.sh .gitignore todo.org
