@@ -12,12 +12,15 @@ init:
 	cjne	a,08,goon
 	mov	r1,#00h
 	jmp	init
-	; serial port interrupts
+	;; serial port interrupts
 	ORG   	23H    
 	PUSH   	psw 
 	PUSH  	acc
+	clr	ri
 	MOV  	psw,#10h
 	mov	sbuf,tl0
+	setb	ti
+	clr	ti
 	POP 	acc
 	POP 	psw
 	RETI
@@ -34,19 +37,19 @@ start:	; main program
 	mov     sp,#50h		; stack pointer set
 	MOV     PSW,#00		; bank select (0)
 	MOV     r7,#20H  	; cycle counter
-	MOV     scon,#50H	; serial port preparation (not considered in current modeller)
+	MOV     scon,#50H	; serial port preparation (not considered in current emulator)
         MOV     TH0,#0d0H
         MOV     TL0,#0d0H
 	MOV     TMOD,#22H	; prepare timer
 	SETB    TR0
-	MOV    	ie,#8bH
+	MOV    	ie,#10010010b
 	mov     08,#03h      	; for use in timer interrupt handler
 	mov     09,#001h      	; for use in timer interrupt handler
 Repeate:
-	NOP              	; idle commands 
-	NOP              	; for background work 
-	NOP			; imitation
+	nop
+	nop
+	nop
+	nop
 	jmp 	repeate
-
 	DJNZ	r7,repeate
 	JMP   	$
