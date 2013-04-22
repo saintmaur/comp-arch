@@ -1,57 +1,55 @@
-	maska 	equ 0aah
-	max	equ 0a0ah
-        ORG     00
-        JMP     100H
-	; timer interrupt
-	ORG   	0bH 
-	JMP    	50h
-	Org     50h    
-	PUSH   	psw ;   защита основных регистров
+	jmp	100h
+	;; timer interrupts
+	;; r0 - max value
+	;; r1 - current value
+	org   	0bH 
+	PUSH   	psw
 	PUSH  	acc
-	MOV  	psw,# 08h  ;Изменение банка регистров
-	;; <<выполнение действий,  вызываемых при прерывании>>
-	;; <   в соответствии с индивидуальным заданием>>
-	
-	POP 	acc
-	POP 	psw     ;  восстановление регистров        
-	RETI      ; выход из обработчика
-	; ------------------------------- конец обработчика прерываний от таймера 
-
-
-	;-------------------обработчик   прерываний от последовательного порта
-	; ( если требуется индивидуальным заданием)
+	MOV  	psw,#08h
+init:	
+	mov	p3,r1
+	mov	a,p3	
+	cjne	a,08,goon
+	mov	r1,#00h
+	jmp	init
+	;; serial port interrupts
 	ORG   	23H    
-	PUSH   	psw ;   защита основных регистров
+	PUSH   	psw 
 	PUSH  	acc
-	MOV  	psw,# 10h  ;Изменение банка регистров
-	;; 	<<выполнение действий,  вызываемых при прерывании>>
-	;; 	<<   в соответствии с индивидуальным заданием>>
+	clr	ri
+	MOV  	psw,#10h
+	mov	sbuf,tl0
+	setb	ti
+	clr	ti
 	POP 	acc
-	POP 	psw     ;  восстановление регистров        
-	RETI      ; выход из обработчика
-	; -------------- конец обработчика прерываний от порта 
-	;; main program
-	ORG 	100H  ; директива выделения памяти программ;  место расположения 
-	;; 	:рабочей программы
-	mov     sp,#50h   ;  установка вершины стека
-	MOV     PSW,#00          
-	MOV     r7,#nn  ; rr  - 	имя регистра ( любого по выбору студента)
-	                        ;nn  - число повторений теста   ( любое число по выбору
-	                        ;      студента) 
-	MOV     scon,#50H;; 	<< настройка режима последовательного порта ( загрузка регистрa SCON)>>
-	MOV     TMOD,#02H;; 	<< настройка таймера ( загрузка регистров  TMOD,TLx,THx)>>	
+	POP 	psw
+	RETI
+
+goon:
+	inc	p3
+	mov	r1,p3
+	POP 	acc
+	POP 	psw
+	RETI
+	
+start:	; main program
+	ORG 	100H
+	mov     sp,#50h		; stack pointer set
+	MOV     PSW,#00		; bank select (0)
+	MOV     r7,#20H  	; cycle counter
+	MOV     scon,#50H	; serial port preparation (not considered in current emulator)
+        MOV     TH0,#0d0H
+        MOV     TL0,#0d0H
+	MOV     TMOD,#22H	; prepare timer
 	SETB    TR0
-	MOV    	ie,#8bH   ; разрешить прерывания в соответствии с инд. заданием
-	mov     08,#maska   ; to be used in extern. intr subroutine
-Repeate:    	   ; метка возврата
-	NOP                ; 3 команды имитируют фоновую задачу
-	NOP                ; 
-	NOP
-	                    ; jmp repeate  ;  раскомментировать при задании ПГ=1
-	                     ; Jnb SCONx,repeate   ; раскомментировать при задании ПГ=3 *
-	                    ;  Jnb SCONx, $   ; раскомментировать при задании ПГ=2 *
-	;; 	: *  - ожидание завершения обмена x=   0 или 1 в зависимости от	индивидуального задания
-	;;преобразование принятых с порта данных
-	MOV	p3,a  ; выдача результата на порт вывода
-	DJNZ	r7,repeate  ;  повторить для новых данных если они не исчерпаны   
-	JMP   	$   ; блокировка продолжения после исчерпания теста
+	MOV    	ie,#10010010b
+	mov     08,#03h      	; for use in timer interrupt handler
+	mov     09,#001h      	; for use in timer interrupt handler
+Repeate:
+	nop
+	nop
+	nop
+	nop
+	jmp 	repeate
+	DJNZ	r7,repeate
+	JMP   	$
