@@ -1,0 +1,10 @@
+db	#ffH
+db	#26H
+db	#48H
+db	#87H
+db	#ffH
+db	#a2H
+db	#30H
+db	#55H
+db	#71H
+db	#00H
