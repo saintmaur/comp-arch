@@ -8,13 +8,14 @@
         mov	r1,#020H
 	    mov	r2,#078H	;; constant to compare with
 	    mov	r3,#0aH		;; counter for RAM reading
-        mov	r4,#030H    ;; address pointer for write operations
-        mov 08,#030H
+        ;;         mov	r4,#030H
+        mov 010h,#030h ;; address pointer for write operation start
+        mov r5,#0ah       ;counter for internal data fill
 	    movc   	a,@a+DPTR
 	    call	chknwr
 
         ;;init internal data
-        mov r5,#0ah
+
 init:
         mov a,r1
         mov b,a
@@ -34,6 +35,7 @@ ramreadrepeat:
 	    inc	r0
 	    djnz	r3,ramreadrepeat
 
+        jmp exit
 	    ;; check and write procedure
 chknwr:
 	    cjne	a,02,goon
@@ -44,7 +46,7 @@ goon:
 write:
         push    psw
         push    acc
-        mov psw,#08H
+        mov psw,#10H
 	 	mov	@r0,a
 	    inc	r0
         pop acc
