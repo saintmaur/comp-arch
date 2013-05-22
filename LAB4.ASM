@@ -52,7 +52,7 @@ write:
         pop 	acc
         pop 	psw
 goodbuy:
-	reti
+	ret
 exit:
 	jmp	$
 
